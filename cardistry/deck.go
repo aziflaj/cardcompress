@@ -28,6 +28,42 @@ func (d *Deck) Shuffle() {
 	}
 }
 
+// Compress the deck
+// @return sign: false means the series starts with Black,
+//
+//	true means it starts with Red
+//
+// @return compressArray: the array of the compressed deck
+func (d *Deck) Compress() (bool, []uint8) {
+	sign := false
+	firstCard := (*d)[0]
+	if firstCard.Suit == "♡" || firstCard.Suit == "♢" {
+		sign = true
+	}
+
+	// count them
+	var compressArray []uint8
+	prevIndex := 0
+	for index, card := range *d {
+		if index == 0 {
+			compressArray = append(compressArray, 1)
+			continue
+		}
+
+		prevCard := (*d)[prevIndex]
+
+		if card.Color() == prevCard.Color() {
+			compressArray[prevIndex] += 1
+			continue
+		}
+
+		compressArray = append(compressArray, 1)
+		prevIndex += 1
+	}
+
+	return sign, compressArray
+}
+
 func (d *Deck) String() string {
 	var s string
 	for _, card := range *d {

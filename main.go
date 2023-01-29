@@ -2,84 +2,59 @@ package main
 
 import (
 	"aziflaj/cardcompress/cardistry"
-
 	"fmt"
+	"strconv"
 )
 
-// Compress the deck
-// @return sign: false means the series starts with Black,
-//
-//	true means it starts with Red
-//
-// @return compressArray: the array of the compressed deck
-func compress(deck *cardistry.Deck) (bool, []uint8) {
-	// false means the series starts with Black,
-	// true means it starts with Red
-	sign := false
-	firstCard := (*deck)[0]
-	if firstCard.Suit == "♡" || firstCard.Suit == "♢" {
-		sign = true
-	}
-
-	// count them
-	var compressArray []uint8
-	prevIndex := 0
-	for index, card := range *deck {
-		if index == 0 {
-			compressArray = append(compressArray, 1)
-		} else {
-			prevCard := (*deck)[prevIndex]
-
-			if card.Color() != prevCard.Color() {
-				compressArray = append(compressArray, 1)
-				prevIndex += 1
-			} else {
-				compressArray[prevIndex] += 1
-			}
-		}
-
-	}
-
-	return sign, compressArray
-}
-
 func main() {
-	// experiments with bit shifting
-	// bitsy := 0b0010
-	// fmt.Println(bitsy)
-	// fmt.Println(bitsy << 1)
-	// fmt.Println(bitsy << 2)
-
-	sum := 0
-	ca := 0
-
 	// Deck magistry
 	deck := cardistry.NewDeck()
 
-	const trials = 100000
-	// do the magic many times
-	for i := 0; i < trials; i++ {
-		deck.Shuffle()
-		_, compressArray := compress(deck)
+	matrix := NewDeckMatrix(deck)
 
-		caSum := len(compressArray)
-		sum += caSum
+	fmt.Println(matrix)
+}
 
-		if i%100 == 0 {
-			fmt.Println("CumAvg", ca)
-			fmt.Println("Count", i)
-			fmt.Println("Length of last run", len(compressArray))
+type DeckMatrix struct {
+	Sign  bool
+	Frame []uint32
+}
 
-			ca = ca + (caSum-ca)/(i+1)
-			fmt.Println("CumAvg", ca)
-		} else {
-			ca = ca + (caSum-ca)/(i+1)
+// Creates new DeckMatrix from a deck
+// @param d: the deck to be compressed
+// @return DeckMatrix: the compressed deck, with a Sign and a Frame
+func NewDeckMatrix(d *cardistry.Deck) *DeckMatrix {
+	matrix := &DeckMatrix{}
+	sign, arr := d.Compress()
+	matrix.Sign = sign
+
+	robin := 0
+	bigboi := uint32(0)
+	for _, num := range arr {
+		bigboi = bigboi | uint32(num)<<(robin*8)
+		robin++
+
+		if robin == 4 { // reset robin
+			matrix.Frame = append(matrix.Frame, bigboi)
+			robin = 0
+			bigboi = 0
 		}
-
 	}
 
-	fmt.Println("CumAvg", ca)
-	fmt.Println("Sum", sum)
-	fmt.Println("Avg", sum/trials)
+	return matrix
+}
 
+func (cd *DeckMatrix) String() string {
+	var s string
+	s += fmt.Sprintf("Sign: %v\n", cd.Sign)
+
+	s += "Frame: ["
+	for _, num := range cd.Frame {
+		// s += strconv.FormatInt(int64(num), 16)
+		s += strconv.Itoa(int(num))
+		s += " "
+	}
+	s += fmt.Sprint("\b]\n")
+
+	return s
 }
