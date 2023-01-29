@@ -8,6 +8,24 @@ import (
 	"os"
 )
 
+func writeToFile(filename string, data any) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	buf := new(bytes.Buffer)
+	err = binary.Write(file, binary.LittleEndian, data)
+	if err != nil {
+		return err
+	}
+
+	file.Write(buf.Bytes())
+
+	return nil
+}
+
 func main() {
 	deck := cardistry.NewDeck()
 	deck.Shuffle()
@@ -28,22 +46,4 @@ func main() {
 	}
 
 	fmt.Println(matrix.Decompress())
-}
-
-func writeToFile(filename string, data any) error {
-	file, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	buf := new(bytes.Buffer)
-	err = binary.Write(file, binary.LittleEndian, data)
-	if err != nil {
-		return err
-	}
-
-	file.Write(buf.Bytes())
-
-	return nil
 }
