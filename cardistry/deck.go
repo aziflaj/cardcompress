@@ -2,14 +2,13 @@ package cardistry
 
 import (
 	"math/rand"
-	"time"
 )
 
 type Deck []Card // Deck is a slice of Card
 
 func NewDeck() *Deck {
 	d := &Deck{}
-	suits := []string{"♤", "♡", "♢", "♧"}
+	suits := []string{Spades, Hearts, Diamonds, Clubs}
 	for _, suit := range suits {
 		for i := 1; i <= 13; i++ {
 			*d = append(*d, Card{Number: uint8(i), Suit: suit})
@@ -20,12 +19,12 @@ func NewDeck() *Deck {
 }
 
 func (d *Deck) Shuffle() {
-	rand.Seed(time.Now().UnixNano())
+	// rand.Seed(time.Now().UnixNano())
+	rand.Seed(42)
 	// Fisher Yates shuffle
-	for i := len(*d) - 1; i > 0; i-- {
-		j := rand.Intn(i + 1)
+	rand.Shuffle(len(*d), func(i, j int) {
 		(*d)[i], (*d)[j] = (*d)[j], (*d)[i]
-	}
+	})
 }
 
 // Compress the deck
@@ -37,7 +36,7 @@ func (d *Deck) Shuffle() {
 func (d *Deck) Compress() (bool, []uint8) {
 	sign := false
 	firstCard := (*d)[0]
-	if firstCard.Suit == "♡" || firstCard.Suit == "♢" {
+	if firstCard.Red() {
 		sign = true
 	}
 
@@ -45,18 +44,21 @@ func (d *Deck) Compress() (bool, []uint8) {
 	var compressArray []uint8
 	prevIndex := 0
 	for index, card := range *d {
-		if index == 0 {
+		if index == 0 { // First count, nothing to compare with
 			compressArray = append(compressArray, 1)
 			continue
 		}
 
-		prevCard := (*d)[prevIndex]
+		// Compare with previous card
+		prevCard := (*d)[index-1]
 
+		// If the color is the same, increment the count
 		if card.Color() == prevCard.Color() {
 			compressArray[prevIndex] += 1
 			continue
 		}
 
+		// add a new count
 		compressArray = append(compressArray, 1)
 		prevIndex += 1
 	}
@@ -66,8 +68,11 @@ func (d *Deck) Compress() (bool, []uint8) {
 
 func (d *Deck) String() string {
 	var s string
-	for _, card := range *d {
+	for index, card := range *d {
 		s += card.String() + " "
+		if (index+1)%6 == 0 {
+			s += "\n"
+		}
 	}
 	return s
 }
