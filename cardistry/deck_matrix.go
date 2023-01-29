@@ -1,10 +1,7 @@
 package cardistry
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
-	"os"
 	"strconv"
 )
 
@@ -28,7 +25,6 @@ func NewColorSeq(sign bool, arr []int32) *ColorSeq {
 
 		robin++
 		if robin == 6 { // reset robin and bigboi
-			fmt.Println(bigboi)
 			frame[frameIdx] = bigboi
 			robin = 0
 			bigboi = 0
@@ -41,6 +37,7 @@ func NewColorSeq(sign bool, arr []int32) *ColorSeq {
 	return &ColorSeq{Sign: sign, Frame: frame}
 }
 
+// Convert from a ColorSeq to a sign and a tally
 func (cs *ColorSeq) Decompress() string {
 	var s string
 	if cs.Sign {
@@ -75,22 +72,4 @@ func (cs *ColorSeq) String() string {
 	}
 
 	return fmt.Sprintf("ColorSeq: {Sign: %v; Frame: [%s\b]}\n", sign, sFrame)
-}
-
-func (cs *ColorSeq) Dump(filename string) error {
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	buf := new(bytes.Buffer)
-	// err = binary.Write(buf, binary.LittleEndian, m.Sign)
-	err = binary.Write(buf, binary.LittleEndian, cs.Frame)
-	if err != nil {
-		return err
-	}
-
-	f.Write(buf.Bytes())
-	return nil
 }

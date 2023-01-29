@@ -9,24 +9,23 @@ import (
 )
 
 func main() {
-	// Deck magistry
 	deck := cardistry.NewDeck()
 	deck.Shuffle()
 	fmt.Println(deck)
 
 	sign, tally := deck.Compress()
 	fmt.Println(tally)
-	// err := writeToFile("tally.bin", tally)
-	// if err != nil {
-	// 	panic(err)
-	// }
+	err := writeToFile("tally.bin", tally)
+	if err != nil {
+		panic(err)
+	}
+
 	matrix := cardistry.NewColorSeq(sign, tally)
 	fmt.Println(matrix)
-
-	// err = matrix.Dump("matrix.bin")
-	// if err != nil {
-	// 	panic(err)
-	// }
+	err = writeToFile("matrix.bin", matrix.Frame)
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Println(matrix.Decompress())
 }
