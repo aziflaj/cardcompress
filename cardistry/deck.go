@@ -2,6 +2,7 @@ package cardistry
 
 import (
 	"math/rand"
+	"time"
 )
 
 type Deck []Card // Deck is a slice of Card
@@ -11,7 +12,7 @@ func NewDeck() *Deck {
 	suits := []string{Spades, Hearts, Diamonds, Clubs}
 	for _, suit := range suits {
 		for i := 1; i <= 13; i++ {
-			*d = append(*d, Card{Number: int32(i), Suit: suit})
+			*d = append(*d, Card{Number: uint8(i), Suit: suit})
 		}
 	}
 
@@ -19,8 +20,7 @@ func NewDeck() *Deck {
 }
 
 func (d *Deck) Shuffle() {
-	// rand.Seed(time.Now().UnixNano())
-	rand.Seed(42069)
+	rand.Seed(time.Now().UnixNano())
 	// Fisher Yates shuffle
 	rand.Shuffle(len(*d), func(i, j int) {
 		(*d)[i], (*d)[j] = (*d)[j], (*d)[i]
@@ -33,7 +33,7 @@ func (d *Deck) Shuffle() {
 //	true means it starts with Red
 //
 // @return sequences: lengs of the sequences of the same color
-func (d *Deck) Compress() (bool, []int32) {
+func (d *Deck) Compress() (bool, []uint8) {
 	sign := false
 	firstCard := (*d)[0]
 	if firstCard.Red() {
@@ -41,7 +41,7 @@ func (d *Deck) Compress() (bool, []int32) {
 	}
 
 	// count them
-	var sequences []int32
+	var sequences []uint8
 	prevIndex := 0
 	for index, card := range *d {
 		if index == 0 { // First count, nothing to compare with

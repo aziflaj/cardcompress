@@ -14,7 +14,7 @@ type ColorSeq struct {
 // @param sign: the sign of the deck
 // @param arr: array of sequence lengths
 // @return ColorSeq: the compressed sequence
-func NewColorSeq(sign bool, arr []int32) *ColorSeq {
+func NewColorSeq(sign bool, arr []uint8) *ColorSeq {
 	frame := make([]uint32, len(arr)/6+1)
 
 	robin := 0

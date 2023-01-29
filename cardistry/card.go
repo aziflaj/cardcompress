@@ -12,7 +12,7 @@ const (
 )
 
 type Card struct {
-	Number int32
+	Number uint8
 	Suit   string
 }
 
