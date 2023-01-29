@@ -1,28 +1,31 @@
 package cardistry
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
+	"os"
 	"strconv"
 )
 
 type DeckMatrix struct {
 	Sign  bool
-	Frame []uint32
+	Frame []int32
 }
 
 // Creates new DeckMatrix from a deck
 // @param d: the deck to be compressed
 // @return DeckMatrix: the compressed deck, with a Sign and a Frame
 // func NewDeckMatrix(d *Deck) *DeckMatrix {
-func NewDeckMatrix(sign bool, arr []uint8) *DeckMatrix {
+func NewDeckMatrix(sign bool, arr []int32) *DeckMatrix {
 	// sign, arr := d.Compress()
-	var frame []uint32 = make([]uint32, len(arr)/4+1)
+	var frame []int32 = make([]int32, len(arr)/4+1)
 
 	robin := 0
 	frameIdx := 0
-	bigboi := uint32(0)
+	bigboi := int32(0)
 	for _, num := range arr {
-		bigboi = bigboi | uint32(num)<<(robin*8)
+		bigboi = bigboi | int32(num)<<(robin*8)
 
 		robin++
 		if robin == 4 { // reset robin and bigboi
@@ -59,19 +62,37 @@ func (dm *DeckMatrix) Decompress() string {
 	return s
 }
 
-func (cd *DeckMatrix) String() string {
+func (m *DeckMatrix) String() string {
 	var sign string
-	if cd.Sign {
+	if m.Sign {
 		sign = "R"
 	} else {
 		sign = "B"
 	}
 
 	var sFrame string
-	for _, num := range cd.Frame {
+	for _, num := range m.Frame {
 		sFrame += "0x" + strconv.FormatInt(int64(num), 16) + " "
 		// sFrame += strconv.Itoa(int(num)) + " "
 	}
 
 	return fmt.Sprintf("DeckMatrix: {Sign: %v; Frame: [%s\b]}\n", sign, sFrame)
+}
+
+func (m *DeckMatrix) Dump(filename string) error {
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	buf := new(bytes.Buffer)
+	// err = binary.Write(buf, binary.LittleEndian, m.Sign)
+	err = binary.Write(buf, binary.LittleEndian, m.Frame)
+	if err != nil {
+		return err
+	}
+
+	f.Write(buf.Bytes())
+	return nil
 }

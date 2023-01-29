@@ -12,7 +12,7 @@ func NewDeck() *Deck {
 	suits := []string{Spades, Hearts, Diamonds, Clubs}
 	for _, suit := range suits {
 		for i := 1; i <= 13; i++ {
-			*d = append(*d, Card{Number: uint8(i), Suit: suit})
+			*d = append(*d, Card{Number: int32(i), Suit: suit})
 		}
 	}
 
@@ -33,8 +33,8 @@ func (d *Deck) Shuffle() {
 //
 //	true means it starts with Red
 //
-// @return compressArray: the array of the compressed deck
-func (d *Deck) Compress() (bool, []uint8) {
+// @return sequences: lengs of the sequences of the same color
+func (d *Deck) Compress() (bool, []int32) {
 	sign := false
 	firstCard := (*d)[0]
 	if firstCard.Red() {
@@ -42,11 +42,11 @@ func (d *Deck) Compress() (bool, []uint8) {
 	}
 
 	// count them
-	var compressArray []uint8
+	var sequences []int32
 	prevIndex := 0
 	for index, card := range *d {
 		if index == 0 { // First count, nothing to compare with
-			compressArray = append(compressArray, 1)
+			sequences = append(sequences, 1)
 			continue
 		}
 
@@ -55,16 +55,16 @@ func (d *Deck) Compress() (bool, []uint8) {
 
 		// If the color is the same, increment the count
 		if card.Color() == prevCard.Color() {
-			compressArray[prevIndex] += 1
+			sequences[prevIndex] += 1
 			continue
 		}
 
 		// add a new count
-		compressArray = append(compressArray, 1)
+		sequences = append(sequences, 1)
 		prevIndex += 1
 	}
 
-	return sign, compressArray
+	return sign, sequences
 }
 
 func (d *Deck) String() string {

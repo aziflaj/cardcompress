@@ -12,12 +12,12 @@ const (
 )
 
 type Card struct {
-	Number uint8
+	Number int32
 	Suit   string
 }
 
 func (c *Card) Color() string {
-	if c.Suit == Spades || c.Suit == Clubs {
+	if c.Black() {
 		return "Black"
 	}
 
