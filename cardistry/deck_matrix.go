@@ -21,18 +21,15 @@ func NewDeckMatrix(sign bool, arr []uint8) *DeckMatrix {
 	robin := 0
 	frameIdx := 0
 	bigboi := uint32(0)
-	var quartet string
 	for _, num := range arr {
 		bigboi = bigboi | uint32(num)<<(robin*8)
-		quartet = fmt.Sprintf("%d %s", num, quartet)
 
 		robin++
 		if robin == 4 { // reset robin and bigboi
+			frame[frameIdx] = bigboi
 			robin = 0
 			bigboi = 0
 			frameIdx++
-			fmt.Println(quartet)
-			quartet = ""
 		}
 
 		frame[frameIdx] = bigboi

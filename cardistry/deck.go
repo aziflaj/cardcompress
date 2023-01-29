@@ -2,6 +2,7 @@ package cardistry
 
 import (
 	"math/rand"
+	"time"
 )
 
 type Deck []Card // Deck is a slice of Card
@@ -19,8 +20,8 @@ func NewDeck() *Deck {
 }
 
 func (d *Deck) Shuffle() {
-	// rand.Seed(time.Now().UnixNano())
-	rand.Seed(42)
+	rand.Seed(time.Now().UnixNano())
+	// rand.Seed(42)
 	// Fisher Yates shuffle
 	rand.Shuffle(len(*d), func(i, j int) {
 		(*d)[i], (*d)[j] = (*d)[j], (*d)[i]
