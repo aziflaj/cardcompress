@@ -15,16 +15,18 @@ func main() {
 	fmt.Println(deck)
 
 	sign, tally := deck.Compress()
-	err := writeToFile("tally.bin", tally)
-	if err != nil {
-		panic(err)
-	}
-	matrix := cardistry.NewDeckMatrix(sign, tally)
+	fmt.Println(tally)
+	// err := writeToFile("tally.bin", tally)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	matrix := cardistry.NewColorSeq(sign, tally)
 	fmt.Println(matrix)
-	err = matrix.Dump("matrix.bin")
-	if err != nil {
-		panic(err)
-	}
+
+	// err = matrix.Dump("matrix.bin")
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	fmt.Println(matrix.Decompress())
 }
